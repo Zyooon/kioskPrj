@@ -4,7 +4,27 @@ import java.util.*;
 import java.util.function.Function;
 
 public class Kiosk {
-    private OrderItem orderItem;
+    int selectNum;
+    double totalPrice;
+    
+    //숫자 관리
+    private enum Number{
+        ZERO(0),
+        ONE(1),
+        TWO(2),
+        THREE(3),
+        FOUR(4),
+        FIVE(5);
+
+        private final int number;
+
+        Number(int number){
+            this.number = number;
+        }
+        public int getNum(){
+            return number;
+        }
+    }
 
     //할인 정보 enum
     private enum DiscountType{
@@ -30,29 +50,28 @@ public class Kiosk {
             return discount.apply(num);
         }
 
-        // Type Name 리턴
-        public String getTypeName() {
-            return typeName;
-        }
-
         public int getTypeNumber(){
             return typeNumber;
         }
 
     }
 
-    //키오스크 실행 및 입력 부분
+    //키오스크 실행
     public void start(Menu menu){
-        //Scanner sc = new Scanner(System.in);
-        int selectNum = 0;
-        double totalPrice = 0.0;
+        Scanner sc = new Scanner(System.in);
+
         Map<Integer, OrderItem> orderItemMap = new HashMap();
 
         //카테고리 출력
-        menu.showCategory(orderItemMap.isEmpty());
+        boolean mapIsEmpty = orderItemMap.isEmpty();
+        menu.showCategory(mapIsEmpty);
 
         //map.isEmpty 일 경우 에러체크 (구현필요)
-        selectNum = 1;
+        if(mapIsEmpty){
+            selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.THREE.getNum());
+        }else {
+            selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FIVE.getNum());
+        }
 
         //메뉴 선택 후 장바구니 넣기
         if(selectNum < 4) {
@@ -80,6 +99,8 @@ public class Kiosk {
             orderItemMap.clear();
         }
 
+
+
         //할인정보 출력
         showDiscountInfo();
         selectNum = 3;
@@ -89,6 +110,26 @@ public class Kiosk {
 
         System.out.println("총 가격 : " + totalPrice);
 
+    }
+
+    //번호 입력받는 부분
+    private int inputNumber(Scanner sc, int minNum, int maxNum){
+
+        try{
+            selectNum = sc.nextInt();
+            sc.nextLine();
+
+            if(selectNum <= maxNum && selectNum >= minNum){
+                return selectNum;
+            }else {
+                System.out.println("숫자를 제대로 입력해 주세요. (" + minNum +" ~ " + maxNum + ")");
+                return -1;
+            }
+
+        } catch (Exception e) {
+            System.out.println("숫자를 제대로 입력해 주세요. (" + minNum +" ~ " + maxNum + ")");
+            return -1;
+        }
     }
 
     //메뉴 확인 후 선택
@@ -151,10 +192,10 @@ public class Kiosk {
 
     //할인정보계산
     private double getDiscountPrice(double totalPrice, int selectNum){
-        return Arrays.stream(DiscountType.values())
+        return Arrays.stream(DiscountType.values())//enum 을 스트림으로 사용
                 .filter(value -> value.getTypeNumber() == selectNum) //조건
-                .findAny()//하나의 값만 반환
-                .map(type -> type.discountApply(totalPrice))// 계산
-                .orElse(totalPrice); //없을경우 기존 값 반화
+                .findAny()//하나의 값만 반환 -> 없으면 에러
+                .map(type -> type.discountApply(totalPrice))
+                .orElse(totalPrice);// 계산 없을경우 기존 값 반화 -> 없으면 에러
     }
 }
