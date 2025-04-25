@@ -58,15 +58,16 @@ public class Kiosk {
 
     //키오스크 실행
     public void start(Menu menu){
+        //스캐너
         Scanner sc = new Scanner(System.in);
-
+        //장바구니 map
         Map<Integer, OrderItem> orderItemMap = new HashMap();
 
         //카테고리 출력
         boolean mapIsEmpty = orderItemMap.isEmpty();
         menu.showCategory(mapIsEmpty);
 
-        //map.isEmpty 일 경우 에러체크 (구현필요)
+        //메뉴 카테고리 입력
         if(mapIsEmpty){
             selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.THREE.getNum());
         }else {
@@ -78,37 +79,36 @@ public class Kiosk {
             //메뉴 보여주는 곳
             List<MenuItem> muenList = menu.showAndGetMenuList(selectNum);
 
-            //입력
-            selectNum = 2;
+            //메뉴 입력
+            selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FOUR.getNum());
 
             //메뉴 선택
             MenuItem selectMenu = selectMenu(muenList, selectNum);
 
-            //입력
-            selectNum = 1;
+            //장바구니 추가 여부
+            selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
 
             //장바구니 추가
             orderItemMap = putOrderList(orderItemMap, selectMenu);
 
 
-        }else if(selectNum == 4){
+        } else if(selectNum == 4){
             totalPrice = getTotalPrice(orderItemMap);
             showOrderList(orderItemMap, totalPrice);
-            selectNum = 1;
+            selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
         } else if (selectNum == 5) {
             orderItemMap.clear();
         }
 
-
-
         //할인정보 출력
         showDiscountInfo();
-        selectNum = 3;
+        selectNum = inputNumber(sc, Number.ONE.getNum(), Number.FOUR.getNum());;
         if(selectNum < 4){
             totalPrice = getDiscountPrice(totalPrice,selectNum);
         }
 
         System.out.println("총 가격 : " + totalPrice);
+        sc.close();
 
     }
 
