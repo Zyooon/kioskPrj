@@ -1,12 +1,13 @@
 package com.kiosk;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Function;
 
 public class Kiosk {
     int selectNum;
     double totalPrice;
-    
+
     //숫자 관리
     private enum Number{
         ZERO(0),
@@ -63,51 +64,99 @@ public class Kiosk {
         //장바구니 map
         Map<Integer, OrderItem> orderItemMap = new HashMap();
 
-        //카테고리 출력
-        boolean mapIsEmpty = orderItemMap.isEmpty();
-        menu.showCategory(mapIsEmpty);
 
-        //메뉴 카테고리 입력
-        if(mapIsEmpty){
-            selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.THREE.getNum());
-        }else {
-            selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FIVE.getNum());
+
+        while (true){
+
+            do{
+                //카테고리 출력
+                boolean mapIsEmpty = orderItemMap.isEmpty();
+                menu.showCategory(mapIsEmpty);
+
+                //메뉴 카테고리 입력
+                if(mapIsEmpty){
+                    selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.THREE.getNum());
+                }else {
+                    selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FIVE.getNum());
+                }
+
+            } while( selectNum == -1);
+
+            //0번 입력시 종료
+            if(selectNum == 0){
+                sc.close();
+                return;
+            }
+
+            int categoryNum = selectNum;
+
+            //메뉴 선택 후 장바구니 넣기
+            if(categoryNum < 4) {
+                List<MenuItem> muenList;
+                do{
+                    //메뉴 보여주는 곳
+                    muenList = menu.showAndGetMenuList(categoryNum);
+
+                    //메뉴 입력
+                    selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FOUR.getNum());
+                }while (selectNum == -1);
+
+                if(selectNum == 0){
+                    continue;
+
+                }
+                //메뉴 선택
+                MenuItem selectMenu = selectMenu(muenList, selectNum);
+
+                do{
+                    //장바구니 추가 여부
+                    System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
+                    System.out.println("1. 확인     2. 취소\n");
+                    selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
+                }while (selectNum == -1);
+
+                //장바구니 추가
+                if(selectNum == 1){
+                    orderItemMap = putOrderList(orderItemMap, selectMenu);
+                }
+                continue;
+
+
+            }
+            // 장바구니 확인 후 주문
+            else if(selectNum == 4){
+                //총 가격 계산
+                totalPrice = getTotalPrice(orderItemMap);
+                do{
+                    //주문 조회
+                    showOrderList(orderItemMap, totalPrice);
+                    System.out.println("1. 주문     2. 메뉴판\n");
+                    selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
+                } while (selectNum == -1);
+                if(selectNum == 2) continue;
+
+            }
+            // 진행중인 주문 취소
+            else if (selectNum == 5) {
+                orderItemMap.clear();
+                continue;
+            }
+
+            do{
+                //할인정보 출력
+                showDiscountInfo();
+                selectNum = inputNumber(sc, Number.ONE.getNum(), Number.FOUR.getNum());
+            }while (selectNum == -1);
+
+            if(selectNum != 4){
+                totalPrice = getDiscountPrice(totalPrice,selectNum);
+            }
+
+            System.out.print("주문이 완료되었습니다. 금액은 W ");
+            System.out.print(new DecimalFormat("#.#").format(totalPrice));
+            System.out.println(" 입니다.");
+            break;
         }
-
-        //메뉴 선택 후 장바구니 넣기
-        if(selectNum < 4) {
-            //메뉴 보여주는 곳
-            List<MenuItem> muenList = menu.showAndGetMenuList(selectNum);
-
-            //메뉴 입력
-            selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FOUR.getNum());
-
-            //메뉴 선택
-            MenuItem selectMenu = selectMenu(muenList, selectNum);
-
-            //장바구니 추가 여부
-            selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
-
-            //장바구니 추가
-            orderItemMap = putOrderList(orderItemMap, selectMenu);
-
-
-        } else if(selectNum == 4){
-            totalPrice = getTotalPrice(orderItemMap);
-            showOrderList(orderItemMap, totalPrice);
-            selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
-        } else if (selectNum == 5) {
-            orderItemMap.clear();
-        }
-
-        //할인정보 출력
-        showDiscountInfo();
-        selectNum = inputNumber(sc, Number.ONE.getNum(), Number.FOUR.getNum());;
-        if(selectNum < 4){
-            totalPrice = getDiscountPrice(totalPrice,selectNum);
-        }
-
-        System.out.println("총 가격 : " + totalPrice);
         sc.close();
 
     }
@@ -128,6 +177,7 @@ public class Kiosk {
 
         } catch (Exception e) {
             System.out.println("숫자를 제대로 입력해 주세요. (" + minNum +" ~ " + maxNum + ")");
+            sc.nextLine();
             return -1;
         }
     }
@@ -139,13 +189,8 @@ public class Kiosk {
 
         System.out.println("선택한 메뉴 : " + menuList.get(selectNum-1).toString());
 
-        System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
-        System.out.println("1. 확인     2. 취소\n");
 
         return selectMenu;
-
-
-
     }
 
     //선택한 메뉴 장바구니에 넣기
@@ -168,12 +213,14 @@ public class Kiosk {
 
     //장바구니 리스트 보여줌
     private void showOrderList(Map<Integer, OrderItem> orderItemMap, Double totalPrice){
+
         System.out.println("아래와 같이 주문 하시겠습니까?\n");
         System.out.println("[ Orders ]");
         orderItemMap.entrySet().stream()
                 .forEach(entry -> System.out.println(entry.getValue().getMenuItem().toString() + "  |  " + entry.getValue().getQuantity()+"개\n"));
         System.out.println("[ Total ]");
-        System.out.println("W " + totalPrice + "\n");
+        System.out.println("W " + new DecimalFormat("#.############").
+                format(totalPrice) + "\n");
     }
 
     //장바구니 총 금액

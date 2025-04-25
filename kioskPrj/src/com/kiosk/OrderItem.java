@@ -9,7 +9,6 @@ public class OrderItem {
         this.menuItem = menuItem;
     }
 
-
     public MenuItem getMenuItem() {
         return menuItem;
     }
