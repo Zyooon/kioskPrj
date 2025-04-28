@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 public class Menu {
-    private List<MenuItem> menuList = new ArrayList<>();
 
     //메뉴 정보 Map
     private static Map<Integer, String> categoryNameMap = new HashMap<>() {{

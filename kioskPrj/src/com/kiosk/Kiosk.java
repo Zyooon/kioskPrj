@@ -63,7 +63,6 @@ public class Kiosk {
         //스캐너
         Scanner sc = new Scanner(System.in);
         //장바구니 map
-        //Map<Integer, OrderItem> orderItemMap = new HashMap();
         Map<MenuItem, Integer> orderItemMap = new HashMap<>();
 
 
@@ -195,23 +194,17 @@ public class Kiosk {
     }
 
     //선택한 메뉴 장바구니에 넣기
-    private Map<MenuItem, Integer> putOrderList(Map<MenuItem, Integer> orderItemMap, MenuItem selectMenu){
+    private Map<MenuItem, Integer> putOrderList(Map<MenuItem, Integer> orderItemMap, MenuItem selectMenu) {
 
-        System.out.println("장바구니에 추가 : "+selectMenu.getMenuName()+"\n");
+        System.out.println("장바구니에 추가 : " + selectMenu.getMenuName() + "\n");
 
+        //장바구니에 메뉴가 있을경우 수량 가져옴. 없을경우 0 가져옴
         int quantity = orderItemMap.getOrDefault(selectMenu, 0);
 
+        //메뉴가 있을경우 + 1, 없을경우 1.
         orderItemMap.put(selectMenu, quantity + Number.ONE.getNum());
 
         return orderItemMap;
-//        //장바구니에 같은 제품 있으면 수량 1 추가
-//        if(orderItemMap.containsKey(selectMenu)){
-//            int num = orderItemMap.get(selectMenu) + Number.ONE.getNum();
-//            orderItemMap.put(selectMenu, num);
-//        }else{
-//            orderItemMap.put(menuCode, new OrderItem(selectMenu, 1));
-//        }
-//        return orderItemMap;
     }
 
     //장바구니 리스트 보여줌
