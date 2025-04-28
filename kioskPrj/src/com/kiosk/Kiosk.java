@@ -10,6 +10,7 @@ public class Kiosk {
 
     //숫자 관리
     private enum Number{
+        ERROR(-1),
         ZERO(0),
         ONE(1),
         TWO(2),
@@ -62,12 +63,12 @@ public class Kiosk {
         //스캐너
         Scanner sc = new Scanner(System.in);
         //장바구니 map
-        Map<Integer, OrderItem> orderItemMap = new HashMap();
+        //Map<Integer, OrderItem> orderItemMap = new HashMap();
+        Map<MenuItem, Integer> orderItemMap = new HashMap<>();
 
 
 
         while (true){
-
             do{
                 //카테고리 출력
                 boolean mapIsEmpty = orderItemMap.isEmpty();
@@ -80,10 +81,10 @@ public class Kiosk {
                     selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FIVE.getNum());
                 }
 
-            } while( selectNum == -1);
+            } while( selectNum == Number.ERROR.getNum());
 
             //0번 입력시 종료
-            if(selectNum == 0){
+            if(selectNum == Number.ZERO.getNum()){
                 sc.close();
                 return;
             }
@@ -91,7 +92,7 @@ public class Kiosk {
             int categoryNum = selectNum;
 
             //메뉴 선택 후 장바구니 넣기
-            if(categoryNum < 4) {
+            if(categoryNum < Number.FOUR.getNum()) {
                 List<MenuItem> muenList;
                 do{
                     //메뉴 보여주는 곳
@@ -99,9 +100,9 @@ public class Kiosk {
 
                     //메뉴 입력
                     selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FOUR.getNum());
-                }while (selectNum == -1);
+                }while (selectNum == Number.ERROR.getNum());
 
-                if(selectNum == 0){
+                if(selectNum == Number.ZERO.getNum()){
                     continue;
 
                 }
@@ -113,10 +114,10 @@ public class Kiosk {
                     System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
                     System.out.println("1. 확인     2. 취소\n");
                     selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
-                }while (selectNum == -1);
+                }while (selectNum == Number.ERROR.getNum());
 
                 //장바구니 추가
-                if(selectNum == 1){
+                if(selectNum == Number.ONE.getNum()){
                     orderItemMap = putOrderList(orderItemMap, selectMenu);
                 }
                 continue;
@@ -124,7 +125,7 @@ public class Kiosk {
 
             }
             // 장바구니 확인 후 주문
-            else if(selectNum == 4){
+            else if(selectNum == Number.FOUR.getNum()){
                 //총 가격 계산
                 totalPrice = getTotalPrice(orderItemMap);
                 do{
@@ -132,12 +133,12 @@ public class Kiosk {
                     showOrderList(orderItemMap, totalPrice);
                     System.out.println("1. 주문     2. 메뉴판\n");
                     selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
-                } while (selectNum == -1);
-                if(selectNum == 2) continue;
+                } while (selectNum == Number.ERROR.getNum());
+                if(selectNum == Number.TWO.getNum()) continue;
 
             }
             // 진행중인 주문 취소
-            else if (selectNum == 5) {
+            else if (selectNum == Number.FIVE.getNum()) {
                 orderItemMap.clear();
                 continue;
             }
@@ -146,9 +147,9 @@ public class Kiosk {
                 //할인정보 출력
                 showDiscountInfo();
                 selectNum = inputNumber(sc, Number.ONE.getNum(), Number.FOUR.getNum());
-            }while (selectNum == -1);
+            }while (selectNum == Number.ERROR.getNum());
 
-            if(selectNum != 4){
+            if(selectNum != Number.FOUR.getNum()){
                 totalPrice = getDiscountPrice(totalPrice,selectNum);
             }
 
@@ -172,61 +173,63 @@ public class Kiosk {
                 return selectNum;
             }else {
                 System.out.println("숫자를 제대로 입력해 주세요. (" + minNum +" ~ " + maxNum + ")");
-                return -1;
+                return Number.ERROR.getNum();
             }
 
         } catch (Exception e) {
             System.out.println("숫자를 제대로 입력해 주세요. (" + minNum +" ~ " + maxNum + ")");
             sc.nextLine();
-            return -1;
+            return Number.ERROR.getNum();
         }
     }
 
     //메뉴 확인 후 선택
     private MenuItem selectMenu(List<MenuItem> menuList, int selectNum){
 
-        MenuItem selectMenu = menuList.get(selectNum-1);
+        MenuItem selectMenu = menuList.get(selectNum - Number.ONE.getNum());
 
-        System.out.println("선택한 메뉴 : " + menuList.get(selectNum-1).toString());
+        System.out.println("선택한 메뉴 : " + menuList.get(selectNum - Number.ONE.getNum()).toString());
 
 
         return selectMenu;
     }
 
     //선택한 메뉴 장바구니에 넣기
-    private Map<Integer, OrderItem> putOrderList(Map<Integer, OrderItem> orderItemMap, MenuItem selectMenu){
+    private Map<MenuItem, Integer> putOrderList(Map<MenuItem, Integer> orderItemMap, MenuItem selectMenu){
 
         System.out.println("장바구니에 추가 : "+selectMenu.getMenuName()+"\n");
 
-        int menuCode = selectMenu.getMenuCode();
+        int quantity = orderItemMap.getOrDefault(selectMenu, 0);
 
-        //장바구니에 같은 제품 있으면 수량 1 추가
-        if(orderItemMap.containsKey(menuCode)){
-            OrderItem order = orderItemMap.get(menuCode);
-            order.setQuantity(order.getQuantity()+1);
-            orderItemMap.put(menuCode, order);
-        }else{
-            orderItemMap.put(menuCode, new OrderItem(selectMenu, 1));
-        }
+        orderItemMap.put(selectMenu, quantity + Number.ONE.getNum());
+
         return orderItemMap;
+//        //장바구니에 같은 제품 있으면 수량 1 추가
+//        if(orderItemMap.containsKey(selectMenu)){
+//            int num = orderItemMap.get(selectMenu) + Number.ONE.getNum();
+//            orderItemMap.put(selectMenu, num);
+//        }else{
+//            orderItemMap.put(menuCode, new OrderItem(selectMenu, 1));
+//        }
+//        return orderItemMap;
     }
 
     //장바구니 리스트 보여줌
-    private void showOrderList(Map<Integer, OrderItem> orderItemMap, Double totalPrice){
+    private void showOrderList(Map<MenuItem, Integer> orderItemMap, Double totalPrice){
 
         System.out.println("아래와 같이 주문 하시겠습니까?\n");
         System.out.println("[ Orders ]");
         orderItemMap.entrySet().stream()
-                .forEach(entry -> System.out.println(entry.getValue().getMenuItem().toString() + "  |  " + entry.getValue().getQuantity()+"개\n"));
+                .forEach(entry -> System.out.println(entry.getKey().toString() + "  |  " + entry.getValue()+"개"));
         System.out.println("[ Total ]");
         System.out.println("W " + new DecimalFormat("#.############").
                 format(totalPrice) + "\n");
     }
 
     //장바구니 총 금액
-    private double getTotalPrice(Map<Integer, OrderItem> orderItemMap){
+    private double getTotalPrice(Map<MenuItem, Integer> orderItemMap){
         return orderItemMap.entrySet().stream()
-                .map(entry -> entry.getValue().getMenuItem().getMenuPrice() * entry.getValue().getQuantity())
+                .map(entry -> entry.getKey().getMenuPrice() * entry.getValue())
                 .reduce(0.0,(sum, now) -> sum + now);
     }
 

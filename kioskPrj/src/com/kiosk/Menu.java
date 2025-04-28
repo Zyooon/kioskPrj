@@ -17,24 +17,24 @@ public class Menu {
     }};
 
     private static List<MenuItem> burgerMenuList = new ArrayList<MenuItem>() {{
-        add(new MenuItem(1,"ShackBurger ", 6.9, "토마토, 양상추, 쉑소스가 토핑된 치즈버거"));
-        add(new MenuItem(2,"SmokeShack  ", 8.9, "베이컨, 체리 페퍼에 쉑소스가 토핑된 치즈버거"));
-        add(new MenuItem(3,"Cheeseburger", 6.9, "포테이토 번과 비프패티, 치즈가 토핑된 치즈버거"));
-        add(new MenuItem(4,"Hamburger   ", 5.4, "비프패티를 기반으로 야채가 들어간 기본버거"));
+        add(new MenuItem("ShackBurger ", 6.9, "토마토, 양상추, 쉑소스가 토핑된 치즈버거"));
+        add(new MenuItem("SmokeShack  ", 8.9, "베이컨, 체리 페퍼에 쉑소스가 토핑된 치즈버거"));
+        add(new MenuItem("Cheeseburger", 6.9, "포테이토 번과 비프패티, 치즈가 토핑된 치즈버거"));
+        add(new MenuItem("Hamburger   ", 5.4, "비프패티를 기반으로 야채가 들어간 기본버거"));
     }};
 
     private static List<MenuItem> drinkMenuList = new ArrayList<>(){{
-        add(new MenuItem(11,"Coke   ", 6.9, "콜라"));
-        add(new MenuItem(12,"Sprite ", 8.9, "사이다"));
-        add(new MenuItem(13,"Fanta  ", 6.9, "환타"));
-        add(new MenuItem(14,"Beer   ", 5.4, "맥주"));
+        add(new MenuItem("Coke   ", 6.9, "콜라"));
+        add(new MenuItem("Sprite ", 8.9, "사이다"));
+        add(new MenuItem("Fanta  ", 6.9, "환타"));
+        add(new MenuItem("Beer   ", 5.4, "맥주"));
     }};
 
     private static List<MenuItem> dessertMenuList = new ArrayList<>(){{
-        add(new MenuItem(21,"Fries   ", 6.9, "감자튀김"));
-        add(new MenuItem(22,"Tender  ", 8.9, "치킨 텐더"));
-        add(new MenuItem(23,"Coleslaw", 6.9, "코울슬로"));
-        add(new MenuItem(24,"Egg Tart", 5.4, "에그타르트"));
+        add(new MenuItem("Fries   ", 6.9, "감자튀김"));
+        add(new MenuItem("Tender  ", 8.9, "치킨 텐더"));
+        add(new MenuItem("Coleslaw", 6.9, "코울슬로"));
+        add(new MenuItem("Egg Tart", 5.4, "에그타르트"));
     }};
 
 
