@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 public class Menu {
 
     //메뉴 정보 Map
-    private static Map<Integer, String> categoryNameMap = new HashMap<>() {{
+    private static Map<Integer, String> menuCategory = new HashMap<>() {{
         put(1, "[ BURGERS MENU ]");
         put(2, "[ DRINKS MENU ]");
         put(3, "[ DESSERTS MENU ]");
@@ -57,22 +57,20 @@ public class Menu {
 
 
     //선택한 카테고리의 메뉴판 보여주고 리턴
-    public List<MenuItem> showAndGetMenuList(int selectNum){
+    public void showMenuList(List<MenuItem> menuItemList, int selectNum){
 
-        System.out.println(categoryNameMap.get(selectNum));
+        System.out.println(menuCategory.get(selectNum));
 
-        List<MenuItem> menuItemList = categoryList(selectNum);
+
         IntStream.range(0, menuItemList.size())
                 .forEach(item -> System.out.println(item+1 + ". "+ menuItemList.get(item).toString()));
 
         System.out.println("0. 뒤로가기");
 
-        return menuItemList;
-
     }
 
     //카테고리 종류 선택
-    private List<MenuItem> categoryList(int selectNum){
+    public List<MenuItem> getMenuItemList(int selectNum){
         switch (selectNum){
             case 1 : return getBurgerMenuList();
             case 2 : return getDrinkMenuList();
@@ -81,6 +79,7 @@ public class Menu {
         }
     }
 
+    //카테고리 목록 보여주기
     public void showCategory(boolean isMapEmpty) {
         System.out.println("[ MAIN MENU ]");
         System.out.println("1. Burgers");

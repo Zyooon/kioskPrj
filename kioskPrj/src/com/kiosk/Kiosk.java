@@ -5,11 +5,11 @@ import java.util.*;
 import java.util.function.Function;
 
 public class Kiosk {
-    int selectNum;
+    int inputNumber;
     double totalPrice;
 
     //숫자 관리
-    private enum Number{
+    private enum DefaultNumber {
         ERROR(-1),
         ZERO(0),
         ONE(1),
@@ -20,10 +20,10 @@ public class Kiosk {
 
         private final int number;
 
-        Number(int number){
+        DefaultNumber(int number){
             this.number = number;
         }
-        public int getNum(){
+        public int getValue(){
             return number;
         }
     }
@@ -38,18 +38,18 @@ public class Kiosk {
         // 필드
         private final int typeNumber;
         private final String typeName;
-        private final Function<Double, Double> discount;
+        private final Function<Double, Double> discountApply;
 
         // 생성자
-        DiscountType(int typeNumber, String typeName, Function<Double, Double> discount) {
+        DiscountType(int typeNumber, String typeName, Function<Double, Double> discountApply) {
             this.typeNumber = typeNumber;
             this.typeName = typeName;
-            this.discount = discount;
+            this.discountApply = discountApply;
         }
 
         // 연산 값 리턴
-        public double discountApply(double num) {
-            return discount.apply(num);
+        public double getDiscountedPrice(double num) {
+            return discountApply.apply(num);
         }
 
         public int getTypeNumber(){
@@ -61,10 +61,9 @@ public class Kiosk {
     //키오스크 실행
     public void start(Menu menu){
         //스캐너
-        Scanner sc = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         //장바구니 map
         Map<MenuItem, Integer> orderItemMap = new HashMap<>();
-
 
 
         while (true){
@@ -75,81 +74,89 @@ public class Kiosk {
 
                 //메뉴 카테고리 입력
                 if(mapIsEmpty){
-                    selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.THREE.getNum());
+                    inputNumber = DefaultNumber(scanner, DefaultNumber.ZERO.getValue(), DefaultNumber.THREE.getValue());
                 }else {
-                    selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FIVE.getNum());
+                    inputNumber = DefaultNumber(scanner, DefaultNumber.ZERO.getValue(), DefaultNumber.FIVE.getValue());
                 }
 
-            } while( selectNum == Number.ERROR.getNum());
+            } while( inputNumber == DefaultNumber.ERROR.getValue());
 
             //0번 입력시 종료
-            if(selectNum == Number.ZERO.getNum()){
-                sc.close();
+            if(inputNumber == DefaultNumber.ZERO.getValue()){
+                scanner.close();
                 return;
             }
 
-            int categoryNum = selectNum;
+            int categoryNumber = inputNumber;
 
             //메뉴 선택 후 장바구니 넣기
-            if(categoryNum < Number.FOUR.getNum()) {
-                List<MenuItem> muenList;
+            if(categoryNumber < DefaultNumber.FOUR.getValue()) {
+                List<MenuItem> menuItemList;
                 do{
-                    //메뉴 보여주는 곳
-                    muenList = menu.showAndGetMenuList(categoryNum);
+                    //메뉴 정보 가져옴
+                    menuItemList = menu.getMenuItemList(inputNumber);
 
-                    //메뉴 입력
-                    selectNum = inputNumber(sc, Number.ZERO.getNum(), Number.FOUR.getNum());
-                }while (selectNum == Number.ERROR.getNum());
+                    //메뉴 정보 보여주는 곳
+                    menu.showMenuList(menuItemList, categoryNumber);
 
-                if(selectNum == Number.ZERO.getNum()){
+                    //메뉴 선택
+                    inputNumber = DefaultNumber(scanner, DefaultNumber.ZERO.getValue(), DefaultNumber.FOUR.getValue());
+                }while (inputNumber == DefaultNumber.ERROR.getValue());
+
+                // 0번일경우 처음부터 다시 시작
+                if(inputNumber == DefaultNumber.ZERO.getValue()){
                     continue;
-
                 }
-                //메뉴 선택
-                MenuItem selectMenu = selectMenu(muenList, selectNum);
+
+                //선택된 메뉴 정보 가져옴
+                MenuItem selectedMenu = getSelectedMenuByNumber(menuItemList, inputNumber);
 
                 do{
                     //장바구니 추가 여부
                     System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
                     System.out.println("1. 확인     2. 취소\n");
-                    selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
-                }while (selectNum == Number.ERROR.getNum());
+                    inputNumber = DefaultNumber(scanner, DefaultNumber.ONE.getValue(), DefaultNumber.TWO.getValue());
+                }while (inputNumber == DefaultNumber.ERROR.getValue());
 
                 //장바구니 추가
-                if(selectNum == Number.ONE.getNum()){
-                    orderItemMap = putOrderList(orderItemMap, selectMenu);
+                if(inputNumber == DefaultNumber.ONE.getValue()){
+                    orderItemMap = addToOrderList(orderItemMap, selectedMenu);
                 }
                 continue;
 
 
             }
             // 장바구니 확인 후 주문
-            else if(selectNum == Number.FOUR.getNum()){
+            else if(inputNumber == DefaultNumber.FOUR.getValue()){
                 //총 가격 계산
                 totalPrice = getTotalPrice(orderItemMap);
                 do{
-                    //주문 조회
+                    //총 주문 목록 보여줌
                     showOrderList(orderItemMap, totalPrice);
+
+                    //결제 할지 메뉴 더 고를지 선택
                     System.out.println("1. 주문     2. 메뉴판\n");
-                    selectNum = inputNumber(sc, Number.ONE.getNum(), Number.TWO.getNum());
-                } while (selectNum == Number.ERROR.getNum());
-                if(selectNum == Number.TWO.getNum()) continue;
+                    inputNumber = DefaultNumber(scanner, DefaultNumber.ONE.getValue(), DefaultNumber.TWO.getValue());
+                } while (inputNumber == DefaultNumber.ERROR.getValue());
+                if(inputNumber == DefaultNumber.TWO.getValue()) continue;
 
             }
-            // 진행중인 주문 취소
-            else if (selectNum == Number.FIVE.getNum()) {
+            // 진행중인 주문 취소 (장바구니 비우기)
+            else if (inputNumber == DefaultNumber.FIVE.getValue()) {
                 orderItemMap.clear();
                 continue;
             }
 
             do{
-                //할인정보 출력
+                //할인 정보 출력
                 showDiscountInfo();
-                selectNum = inputNumber(sc, Number.ONE.getNum(), Number.FOUR.getNum());
-            }while (selectNum == Number.ERROR.getNum());
 
-            if(selectNum != Number.FOUR.getNum()){
-                totalPrice = getDiscountPrice(totalPrice,selectNum);
+                //할인 정보 선택
+                inputNumber = DefaultNumber(scanner, DefaultNumber.ONE.getValue(), DefaultNumber.FOUR.getValue());
+            }while (inputNumber == DefaultNumber.ERROR.getValue());
+
+            if(inputNumber != DefaultNumber.FOUR.getValue()){
+                totalPrice = getDiscountedPriceByNumber(totalPrice, inputNumber);
             }
 
             System.out.print("주문이 완료되었습니다. 금액은 W ");
@@ -157,52 +164,55 @@ public class Kiosk {
             System.out.println(" 입니다.");
             break;
         }
-        sc.close();
+        scanner.close();
 
     }
 
     //번호 입력받는 부분
-    private int inputNumber(Scanner sc, int minNum, int maxNum){
+    private int DefaultNumber(Scanner scanner, int minNumber, int maxNumber){
 
         try{
-            selectNum = sc.nextInt();
-            sc.nextLine();
+            //스캐너 입력
+            inputNumber = scanner.nextInt();
+            scanner.nextLine();
 
-            if(selectNum <= maxNum && selectNum >= minNum){
-                return selectNum;
+            //입력받은 숫자가 max 와 min 사이일 경우 리턴 -> 아닐경우 에러
+            if(inputNumber <= maxNumber && inputNumber >= minNumber){
+                return inputNumber;
             }else {
-                System.out.println("숫자를 제대로 입력해 주세요. (" + minNum +" ~ " + maxNum + ")");
-                return Number.ERROR.getNum();
+                System.out.println("숫자를 제대로 입력해 주세요. (" + minNumber +" ~ " + maxNumber + ")");
+                return DefaultNumber.ERROR.getValue();
             }
-
+        //값이 이상할 경우 에러
         } catch (Exception e) {
-            System.out.println("숫자를 제대로 입력해 주세요. (" + minNum +" ~ " + maxNum + ")");
-            sc.nextLine();
-            return Number.ERROR.getNum();
+            System.out.println("숫자를 제대로 입력해 주세요. (" + minNumber +" ~ " + maxNumber + ")");
+            scanner.nextLine();
+            return DefaultNumber.ERROR.getValue();
         }
     }
 
     //메뉴 확인 후 선택
-    private MenuItem selectMenu(List<MenuItem> menuList, int selectNum){
+    private MenuItem getSelectedMenuByNumber(List<MenuItem> menuList, int selectNum){
 
-        MenuItem selectMenu = menuList.get(selectNum - Number.ONE.getNum());
+        //입력받은 숫자에 해당하는 번호로 선택한 메뉴 정보 가져옴 (인덱스번호 == 선택한 번호 - 1)
+        MenuItem selectedMenu = menuList.get(selectNum - DefaultNumber.ONE.getValue());
 
-        System.out.println("선택한 메뉴 : " + menuList.get(selectNum - Number.ONE.getNum()).toString());
+        //메뉴 보여줌
+        System.out.println("선택한 메뉴 : " + menuList.get(selectNum - DefaultNumber.ONE.getValue()).toString());
 
-
-        return selectMenu;
+        return selectedMenu;
     }
 
     //선택한 메뉴 장바구니에 넣기
-    private Map<MenuItem, Integer> putOrderList(Map<MenuItem, Integer> orderItemMap, MenuItem selectMenu) {
+    private Map<MenuItem, Integer> addToOrderList(Map<MenuItem, Integer> orderItemMap, MenuItem selectedMenu) {
 
-        System.out.println("장바구니에 추가 : " + selectMenu.getMenuName() + "\n");
+        System.out.println("장바구니에 추가 : " + selectedMenu.getMenuName() + "\n");
 
         //장바구니에 메뉴가 있을경우 수량 가져옴. 없을경우 0 가져옴
-        int quantity = orderItemMap.getOrDefault(selectMenu, 0);
+        int quantity = orderItemMap.getOrDefault(selectedMenu, DefaultNumber.ZERO.getValue());
 
         //메뉴가 있을경우 + 1, 없을경우 1.
-        orderItemMap.put(selectMenu, quantity + Number.ONE.getNum());
+        orderItemMap.put(selectedMenu, quantity + DefaultNumber.ONE.getValue());
 
         return orderItemMap;
     }
@@ -210,10 +220,13 @@ public class Kiosk {
     //장바구니 리스트 보여줌
     private void showOrderList(Map<MenuItem, Integer> orderItemMap, Double totalPrice){
 
+        //주문 목록 표시
         System.out.println("아래와 같이 주문 하시겠습니까?\n");
         System.out.println("[ Orders ]");
         orderItemMap.entrySet().stream()
                 .forEach(entry -> System.out.println(entry.getKey().toString() + "  |  " + entry.getValue()+"개"));
+        
+        //합계 금액 표시
         System.out.println("[ Total ]");
         System.out.println("W " + new DecimalFormat("#.############").
                 format(totalPrice) + "\n");
@@ -221,6 +234,7 @@ public class Kiosk {
 
     //장바구니 총 금액
     private double getTotalPrice(Map<MenuItem, Integer> orderItemMap){
+        //장바구니 리스트의 수량과 가격 합산하여 리턴
         return orderItemMap.entrySet().stream()
                 .map(entry -> entry.getKey().getMenuPrice() * entry.getValue())
                 .reduce(0.0,(sum, now) -> sum + now);
@@ -233,12 +247,13 @@ public class Kiosk {
         System.out.println();
     }
 
-    //할인정보계산
-    private double getDiscountPrice(double totalPrice, int selectNum){
+    //할인 정보 포함하여 계산 후 결과 값 리턴
+    private double getDiscountedPriceByNumber(double totalPrice, int selectNumber){
+        //선택된 숫자로 enum 의 discountType 중 하나 선택 후 할인률 계산
         return Arrays.stream(DiscountType.values())//enum 을 스트림으로 사용
-                .filter(value -> value.getTypeNumber() == selectNum) //조건
+                .filter(value -> value.getTypeNumber() == selectNumber) //조건
                 .findAny()//하나의 값만 반환 -> 없으면 에러
-                .map(type -> type.discountApply(totalPrice))
+                .map(type -> type.getDiscountedPrice(totalPrice))
                 .orElse(totalPrice);// 계산 없을경우 기존 값 반화 -> 없으면 에러
     }
 }
