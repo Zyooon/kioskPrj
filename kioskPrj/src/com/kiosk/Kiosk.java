@@ -5,10 +5,11 @@ import java.util.*;
 import java.util.function.Function;
 
 public class Kiosk {
-    int inputNumber;
-    double totalPrice;
+    static int inputNumber; // 입력값 받는 변수
+    static double totalPrice; // 총 금액
+    static Map<MenuItem, Integer> orderItemMap; //장바구니
 
-    //숫자 관리
+    //입력값 및 에러 숫자 관리
     private enum DefaultNumber {
         ERROR(-1),
         ZERO(0),
@@ -62,9 +63,8 @@ public class Kiosk {
     public void start(Menu menu){
         //스캐너
         Scanner scanner = new Scanner(System.in);
-        //장바구니 map
-        Map<MenuItem, Integer> orderItemMap = new HashMap<>();
-
+        //장바구니 초기화
+        orderItemMap = new HashMap<>();
 
         while (true){
             do{
@@ -87,6 +87,7 @@ public class Kiosk {
                 return;
             }
 
+            //카테고리 번호 입력값 생성
             int categoryNumber = inputNumber;
 
             //메뉴 선택 후 장바구니 넣기
@@ -94,7 +95,7 @@ public class Kiosk {
                 List<MenuItem> menuItemList;
                 do{
                     //메뉴 정보 가져옴
-                    menuItemList = menu.getMenuItemList(inputNumber);
+                    menuItemList = menu.getMenuItemList(categoryNumber);
 
                     //메뉴 정보 보여주는 곳
                     menu.showMenuList(menuItemList, categoryNumber);
@@ -109,7 +110,7 @@ public class Kiosk {
                 }
 
                 //선택된 메뉴 정보 가져옴
-                MenuItem selectedMenu = getSelectedMenuByNumber(menuItemList, inputNumber);
+                MenuItem selectedMenu = getSelectedMenuByNumber(menuItemList);
 
                 do{
                     //장바구니 추가 여부
@@ -120,7 +121,7 @@ public class Kiosk {
 
                 //장바구니 추가
                 if(inputNumber == DefaultNumber.ONE.getValue()){
-                    orderItemMap = addToOrderList(orderItemMap, selectedMenu);
+                    addToOrderList(selectedMenu);
                 }
                 continue;
 
@@ -129,10 +130,10 @@ public class Kiosk {
             // 장바구니 확인 후 주문
             else if(inputNumber == DefaultNumber.FOUR.getValue()){
                 //총 가격 계산
-                totalPrice = getTotalPrice(orderItemMap);
+                totalPrice = getTotalPrice();
                 do{
                     //총 주문 목록 보여줌
-                    showOrderList(orderItemMap, totalPrice);
+                    showOrderList(totalPrice);
 
                     //결제 할지 메뉴 더 고를지 선택
                     System.out.println("1. 주문     2. 메뉴판\n");
@@ -156,10 +157,11 @@ public class Kiosk {
             }while (inputNumber == DefaultNumber.ERROR.getValue());
 
             if(inputNumber != DefaultNumber.FOUR.getValue()){
-                totalPrice = getDiscountedPriceByNumber(totalPrice, inputNumber);
+                totalPrice = getDiscountedPriceByNumber();
             }
 
             System.out.print("주문이 완료되었습니다. 금액은 W ");
+            // double 값의 금액표시를 소수 첫째자리까지만 표시
             System.out.print(new DecimalFormat("#.#").format(totalPrice));
             System.out.println(" 입니다.");
             break;
@@ -192,19 +194,19 @@ public class Kiosk {
     }
 
     //메뉴 확인 후 선택
-    private MenuItem getSelectedMenuByNumber(List<MenuItem> menuList, int selectNum){
+    private MenuItem getSelectedMenuByNumber(List<MenuItem> menuList){
 
         //입력받은 숫자에 해당하는 번호로 선택한 메뉴 정보 가져옴 (인덱스번호 == 선택한 번호 - 1)
-        MenuItem selectedMenu = menuList.get(selectNum - DefaultNumber.ONE.getValue());
+        MenuItem selectedMenu = menuList.get(inputNumber - DefaultNumber.ONE.getValue());
 
-        //메뉴 보여줌
-        System.out.println("선택한 메뉴 : " + menuList.get(selectNum - DefaultNumber.ONE.getValue()).toString());
+        //메뉴 출력
+        System.out.println("선택한 메뉴 : " + menuList.get(inputNumber - DefaultNumber.ONE.getValue()).toString());
 
         return selectedMenu;
     }
 
     //선택한 메뉴 장바구니에 넣기
-    private Map<MenuItem, Integer> addToOrderList(Map<MenuItem, Integer> orderItemMap, MenuItem selectedMenu) {
+    private void addToOrderList(MenuItem selectedMenu) {
 
         System.out.println("장바구니에 추가 : " + selectedMenu.getMenuName() + "\n");
 
@@ -213,12 +215,10 @@ public class Kiosk {
 
         //메뉴가 있을경우 + 1, 없을경우 1.
         orderItemMap.put(selectedMenu, quantity + DefaultNumber.ONE.getValue());
-
-        return orderItemMap;
     }
 
     //장바구니 리스트 보여줌
-    private void showOrderList(Map<MenuItem, Integer> orderItemMap, Double totalPrice){
+    private void showOrderList(Double totalPrice){
 
         //주문 목록 표시
         System.out.println("아래와 같이 주문 하시겠습니까?\n");
@@ -233,7 +233,7 @@ public class Kiosk {
     }
 
     //장바구니 총 금액
-    private double getTotalPrice(Map<MenuItem, Integer> orderItemMap){
+    private double getTotalPrice(){
         //장바구니 리스트의 수량과 가격 합산하여 리턴
         return orderItemMap.entrySet().stream()
                 .map(entry -> entry.getKey().getMenuPrice() * entry.getValue())
@@ -248,10 +248,10 @@ public class Kiosk {
     }
 
     //할인 정보 포함하여 계산 후 결과 값 리턴
-    private double getDiscountedPriceByNumber(double totalPrice, int selectNumber){
+    private double getDiscountedPriceByNumber(){
         //선택된 숫자로 enum 의 discountType 중 하나 선택 후 할인률 계산
         return Arrays.stream(DiscountType.values())//enum 을 스트림으로 사용
-                .filter(value -> value.getTypeNumber() == selectNumber) //조건
+                .filter(value -> value.getTypeNumber() == inputNumber) //조건
                 .findAny()//하나의 값만 반환 -> 없으면 에러
                 .map(type -> type.getDiscountedPrice(totalPrice))
                 .orElse(totalPrice);// 계산 없을경우 기존 값 반화 -> 없으면 에러
