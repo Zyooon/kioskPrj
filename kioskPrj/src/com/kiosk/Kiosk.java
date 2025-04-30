@@ -66,6 +66,7 @@ public class Kiosk {
         //장바구니 초기화
         orderItemMap = new HashMap<>();
 
+        //키오스크 반복문 시작
         while (true){
             do{
                 //카테고리 출력
@@ -74,11 +75,12 @@ public class Kiosk {
 
                 //메뉴 카테고리 입력
                 if(mapIsEmpty){
-                    inputNumber = DefaultNumber(scanner, DefaultNumber.ZERO.getValue(), DefaultNumber.THREE.getValue());
+                    inputNumber = getInputNumber(scanner, DefaultNumber.ZERO.getValue(), DefaultNumber.THREE.getValue());
                 }else {
-                    inputNumber = DefaultNumber(scanner, DefaultNumber.ZERO.getValue(), DefaultNumber.FIVE.getValue());
+                    inputNumber = getInputNumber(scanner, DefaultNumber.ZERO.getValue(), DefaultNumber.FIVE.getValue());
                 }
 
+                //inputNumber 에러 시 입력 반복
             } while( inputNumber == DefaultNumber.ERROR.getValue());
 
             //0번 입력시 종료
@@ -101,7 +103,7 @@ public class Kiosk {
                     menu.showMenuList(menuItemList, categoryNumber);
 
                     //메뉴 선택
-                    inputNumber = DefaultNumber(scanner, DefaultNumber.ZERO.getValue(), DefaultNumber.FOUR.getValue());
+                    inputNumber = getInputNumber(scanner, DefaultNumber.ZERO.getValue(), DefaultNumber.FOUR.getValue());
                 }while (inputNumber == DefaultNumber.ERROR.getValue());
 
                 // 0번일경우 처음부터 다시 시작
@@ -109,14 +111,14 @@ public class Kiosk {
                     continue;
                 }
 
-                //선택된 메뉴 정보 가져옴
+                //선택된 메뉴 정보 Get
                 MenuItem selectedMenu = getSelectedMenuByNumber(menuItemList);
 
                 do{
                     //장바구니 추가 여부
                     System.out.println("위 메뉴를 장바구니에 추가하시겠습니까?");
                     System.out.println("1. 확인     2. 취소\n");
-                    inputNumber = DefaultNumber(scanner, DefaultNumber.ONE.getValue(), DefaultNumber.TWO.getValue());
+                    inputNumber = getInputNumber(scanner, DefaultNumber.ONE.getValue(), DefaultNumber.TWO.getValue());
                 }while (inputNumber == DefaultNumber.ERROR.getValue());
 
                 //장바구니 추가
@@ -132,12 +134,12 @@ public class Kiosk {
                 //총 가격 계산
                 totalPrice = getTotalPrice();
                 do{
-                    //총 주문 목록 보여줌
+                    //총 주문 목록 출력
                     showOrderList(totalPrice);
 
                     //결제 할지 메뉴 더 고를지 선택
                     System.out.println("1. 주문     2. 메뉴판\n");
-                    inputNumber = DefaultNumber(scanner, DefaultNumber.ONE.getValue(), DefaultNumber.TWO.getValue());
+                    inputNumber = getInputNumber(scanner, DefaultNumber.ONE.getValue(), DefaultNumber.TWO.getValue());
                 } while (inputNumber == DefaultNumber.ERROR.getValue());
                 if(inputNumber == DefaultNumber.TWO.getValue()) continue;
 
@@ -153,9 +155,10 @@ public class Kiosk {
                 showDiscountInfo();
 
                 //할인 정보 선택
-                inputNumber = DefaultNumber(scanner, DefaultNumber.ONE.getValue(), DefaultNumber.FOUR.getValue());
+                inputNumber = getInputNumber(scanner, DefaultNumber.ONE.getValue(), DefaultNumber.FOUR.getValue());
             }while (inputNumber == DefaultNumber.ERROR.getValue());
 
+            //할인정보가 4번이 아닐 시, 할인 계산 -> 4번일 경우 계산 x
             if(inputNumber != DefaultNumber.FOUR.getValue()){
                 totalPrice = getDiscountedPriceByNumber();
             }
@@ -171,8 +174,7 @@ public class Kiosk {
     }
 
     //번호 입력받는 부분
-    private int DefaultNumber(Scanner scanner, int minNumber, int maxNumber){
-
+    private int getInputNumber(Scanner scanner, int minNumber, int maxNumber){
         try{
             //스캐너 입력
             inputNumber = scanner.nextInt();
@@ -217,7 +219,7 @@ public class Kiosk {
         orderItemMap.put(selectedMenu, quantity + DefaultNumber.ONE.getValue());
     }
 
-    //장바구니 리스트 보여줌
+    //장바구니 리스트 출력
     private void showOrderList(Double totalPrice){
 
         //주문 목록 표시
@@ -227,12 +229,12 @@ public class Kiosk {
                 .forEach(entry -> System.out.println(entry.getKey().toString() + "  |  " + entry.getValue()+"개"));
         
         //합계 금액 표시
-        System.out.println("[ Total ]");
+        System.out.println("\n[ Total ]");
         System.out.println("W " + new DecimalFormat("#.############").
                 format(totalPrice) + "\n");
     }
 
-    //장바구니 총 금액
+    //장바구니 총 금액 계산
     private double getTotalPrice(){
         //장바구니 리스트의 수량과 가격 합산하여 리턴
         return orderItemMap.entrySet().stream()

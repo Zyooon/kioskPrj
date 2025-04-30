@@ -4,7 +4,6 @@ import java.util.Objects;
 
 public class MenuItem {
     //menu 정보 관리 (DB 같은 곳)
-
     private String menuName;
     private double menuPrice;
     private String menuDescription;

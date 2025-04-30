@@ -15,7 +15,7 @@ public class Menu {
         put(3, "[ DESSERTS MENU ]");
     }};
 
-    private static List<MenuItem> burgerMenuList = new ArrayList<MenuItem>() {{
+    private static List<MenuItem> burgerMenuList = new ArrayList<>() {{
         add(new MenuItem("ShackBurger ", 6.9, "토마토, 양상추, 쉑소스가 토핑된 치즈버거"));
         add(new MenuItem("SmokeShack  ", 8.9, "베이컨, 체리 페퍼에 쉑소스가 토핑된 치즈버거"));
         add(new MenuItem("Cheeseburger", 6.9, "포테이토 번과 비프패티, 치즈가 토핑된 치즈버거"));
@@ -31,7 +31,7 @@ public class Menu {
 
     private static List<MenuItem> dessertMenuList = new ArrayList<>(){{
         add(new MenuItem("Fries   ", 6.9, "감자튀김"));
-        add(new MenuItem("Tender  ", 8.9, "치킨 텐더"));
+        add(new MenuItem("Tender  ", 8.9, "치킨텐더"));
         add(new MenuItem("Coleslaw", 6.9, "코울슬로"));
         add(new MenuItem("Egg Tart", 5.4, "에그타르트"));
     }};
@@ -61,12 +61,10 @@ public class Menu {
 
         System.out.println(menuCategory.get(selectNum));
 
-
         IntStream.range(0, menuItemList.size())
                 .forEach(item -> System.out.println(item+1 + ". "+ menuItemList.get(item).toString()));
 
         System.out.println("0. 뒤로가기");
-
     }
 
     //카테고리 종류 선택
