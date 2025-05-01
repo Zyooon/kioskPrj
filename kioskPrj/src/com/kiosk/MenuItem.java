@@ -4,29 +4,29 @@ import java.util.Objects;
 
 public class MenuItem {
     //속성
-    private String menuName;
-    private double menuPrice;
-    private String menuDescription;
+    private String name;
+    private double price;
+    private String description;
 
     //생성자
-    public MenuItem(String menuName, double menuPrice, String menuDescription) {
-        this.menuName = menuName;
-        this.menuPrice = menuPrice;
-        this.menuDescription = menuDescription;
+    public MenuItem(String name, double price, String description) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
     }
 
     //Getter
-    public String getMenuName() {
-        return menuName;
+    public String getName() {
+        return name;
     }
-    public double getMenuPrice() {
-        return menuPrice;
+    public double getPrice() {
+        return price;
     }
 
     //toString
     @Override
     public String toString() {
-        return menuName +  "   |   W " + menuPrice + "   |   " + menuDescription;
+        return name +  "   |   W " + price + "   |   " + description;
 
     }
 
@@ -35,11 +35,11 @@ public class MenuItem {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         MenuItem menuItem = (MenuItem) o;
-        return Objects.equals(menuName, menuItem.menuName);
+        return Objects.equals(name, menuItem.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(menuName);
+        return Objects.hashCode(name);
     }
 }

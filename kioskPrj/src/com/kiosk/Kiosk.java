@@ -159,7 +159,7 @@ public class Kiosk {
     //선택한 메뉴 장바구니에 넣기
     private void addToOrderList(MenuItem selectedMenu) {
 
-        System.out.println("장바구니에 추가 : " + selectedMenu.getMenuName() + "\n");
+        System.out.println("장바구니에 추가 : " + selectedMenu.getName() + "\n");
 
         //장바구니에 메뉴가 있을경우 수량 가져옴. 없을경우 0 가져옴
         int quantity = orderItemMap.getOrDefault(selectedMenu, DefaultNumber.ZERO.getValue());
@@ -187,7 +187,7 @@ public class Kiosk {
     private double getTotalPrice(){
         //장바구니 리스트의 수량과 가격 합산하여 리턴
         return orderItemMap.entrySet().stream()
-                .map(entry -> entry.getKey().getMenuPrice() * entry.getValue())
+                .map(entry -> entry.getKey().getPrice() * entry.getValue())
                 .reduce(0.0,(sum, now) -> sum + now);
     }
 
