@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 
 public class Menu {
 
-    //메뉴 정보 Map
+    //메뉴 정보 Map 속성
     private static Map<Integer, String> menuCategory = new HashMap<>() {{
         put(1, "[ BURGERS MENU ]");
         put(2, "[ DRINKS MENU ]");
@@ -36,10 +36,11 @@ public class Menu {
         add(new MenuItem("Egg Tart", 5.4, "에그타르트"));
     }};
 
-
+    //기본 생성자
     public Menu() {
     }
 
+    //리스트 Getter
     //버거 리스트
     public List<MenuItem> getBurgerMenuList() {
         return burgerMenuList;

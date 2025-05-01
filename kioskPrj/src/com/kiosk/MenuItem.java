@@ -3,17 +3,19 @@ package com.kiosk;
 import java.util.Objects;
 
 public class MenuItem {
-    //menu 정보 관리 (DB 같은 곳)
+    //속성
     private String menuName;
     private double menuPrice;
     private String menuDescription;
 
+    //생성자
     public MenuItem(String menuName, double menuPrice, String menuDescription) {
         this.menuName = menuName;
         this.menuPrice = menuPrice;
         this.menuDescription = menuDescription;
     }
 
+    //Getter
     public String getMenuName() {
         return menuName;
     }
@@ -21,7 +23,7 @@ public class MenuItem {
         return menuPrice;
     }
 
-
+    //toString
     @Override
     public String toString() {
         return menuName +  "   |   W " + menuPrice + "   |   " + menuDescription;
