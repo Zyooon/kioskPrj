@@ -2,62 +2,11 @@ package com.kiosk;
 
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.function.Function;
 
 public class Kiosk {
     static int inputNumber; // 입력값 받는 변수
     static double totalPrice; // 총 금액
     static Map<MenuItem, Integer> orderItemMap; //장바구니
-
-    //입력값 및 에러 숫자 관리
-    private enum DefaultNumber {
-        ERROR(-1),
-        ZERO(0),
-        ONE(1),
-        TWO(2),
-        THREE(3),
-        FOUR(4),
-        FIVE(5);
-
-        private final int number;
-
-        DefaultNumber(int number){
-            this.number = number;
-        }
-        public int getValue(){
-            return number;
-        }
-    }
-
-    //할인 정보 enum
-    private enum DiscountType{
-        PATRIOT(1,"1. 국가유공자 : 10%", (num) -> num * 0.9),
-        SOLDIER(2,"2. 군인      : 5%", (num) -> num * 0.95),
-        STUDENT(3, "3. 학생      : 3%", (num) -> num * 0.97),
-        NORMAL(4,"4. 일반      : 0%", (num)-> num);
-
-        // 필드
-        private final int typeNumber;
-        private final String typeName;
-        private final Function<Double, Double> discountApply;
-
-        // 생성자
-        DiscountType(int typeNumber, String typeName, Function<Double, Double> discountApply) {
-            this.typeNumber = typeNumber;
-            this.typeName = typeName;
-            this.discountApply = discountApply;
-        }
-
-        // 연산 값 리턴
-        public double getDiscountedPrice(double num) {
-            return discountApply.apply(num);
-        }
-
-        public int getTypeNumber(){
-            return typeNumber;
-        }
-
-    }
 
     //키오스크 실행
     public void start(Menu menu){
@@ -245,7 +194,7 @@ public class Kiosk {
     //할인정보 보여줌
     private void showDiscountInfo(){
         Arrays.stream(DiscountType.values())
-                .forEach(value -> System.out.println(value.typeName));
+                .forEach(value -> System.out.println(value.getTypeName()));
         System.out.println();
     }
 
